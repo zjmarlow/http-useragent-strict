@@ -1,0 +1,38 @@
+{
+  "auth": "zef:zjmarlow",
+  "authors": [
+	"Zachary J Hyun Marlow"
+  ],
+  "build-depends": [
+  ],
+  "depends": [
+	"HTTP::UserAgent:auth<raku-community-modules>"
+  ],
+  "description": "Web user agent",
+  "license": "MIT",
+  "name": "HTTP::UserAgent",
+  "perl": "6.*",
+  "provides": {
+	"HTTP::UserAgent::Strict": "lib/HTTP/UserAgent/Strict.rakumod",
+	"HTTP::Message::Strict": "lib/HTTP/UserAgent/Strict.rakumod",
+	"HTTP::Request::Strict": "lib/HTTP/UserAgent/Strict.rakumod",
+	"HTTP::Response::Strict": "lib/HTTP/UserAgent/Strict.rakumod",
+	"HTTP::Header::Strict": "lib/HTTP/UserAgent/Strict.rakumod",
+	"HTTP::Header::ETag": "lib/HTTP/Header/ETag.rakumod"
+  },
+  "raku": "6.*",
+  "resources": [
+  ],
+  "source-url": "https://github.com/raku-community-modules/HTTP-UserAgent.git",
+  "tags": [
+	"HTTP",
+	"USERAGENT",
+	"CLIENT"
+  ],
+  "test-depends": [
+	"IO::Capture::Simple",
+	"Test::Util::ServerPort",
+	"JSON::Fast"
+  ],
+  "version": "1.2.0"
+}

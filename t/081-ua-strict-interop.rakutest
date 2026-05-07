@@ -1,0 +1,26 @@
+use lib <t/lib>;
+
+use Test;
+use HTTP::Strict::UserAgent;
+use Test::Util::ServerPort;
+use TestServer;
+
+my constant $CRLF = "\x[0D]\x[0A]";
+
+plan 2;
+
+my $port = get-unused-port;
+
+%*ENV<NO_PROXY> = 'localhost';
+
+my $test-server = test-full-message my $done-promise = Promise.new, :$port;
+
+say 'using port ', $port;
+
+my $uas = HTTP::Strict::UserAgent.new;
+my $rs = $uas.post: "http://localhost:$port/POST", { hello => 'world' };
+my ( $eol, $lok ) = $rs.content.split: "\x0d";
+is $eol, 'F', 'no extra eol';
+is $lok, 'T', 'length matches';
+
+$done-promise.keep: 'shutdown';
