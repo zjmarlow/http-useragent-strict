@@ -1,4 +1,4 @@
-use HTTP::UserAgent;
+use HTTP::Strict::UserAgent;
 use Test;
 
 plan 1;
@@ -9,7 +9,7 @@ unless %*ENV<NETWORK_TESTING> {
   exit;
 }
 
-my $ua = HTTP::UserAgent.new;
+my $ua = HTTP::Strict::UserAgent.new;
 lives-ok { $ua.get("http://httpbin.org/image/png") };
 
 # vim: expandtab shiftwidth=4

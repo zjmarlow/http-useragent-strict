@@ -212,10 +212,10 @@ method form-data(Array:D $content, Str:D $boundary) {
 					$content = $headers.field('Content');
 					$headers.remove-field('Content');
 				}
-				my $head = ["Content-Disposition: $disp",
+				my $head = [$disp.Str,
 							$headers.Str,
 							""].join($CRLF);
-				given $content {
+				given $content.values.Str {
 					when Str {
 						@parts.push: $head ~ $content;
 					}

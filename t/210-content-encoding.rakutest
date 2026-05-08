@@ -1,5 +1,5 @@
 use Test;
-use HTTP::UserAgent;
+use HTTP::Strict::UserAgent;
 
 plan 2;
 
@@ -9,7 +9,7 @@ if %*ENV<NETWORK_TESTING> {
         skip-rest("'Compress::Zlib' not installed won't test");
     }
     else {
-        my $ua = HTTP::UserAgent.new;
+        my $ua = HTTP::Strict::UserAgent.new;
         subtest {
             my $res;
             lives-ok { $res = $ua.get("http://httpbin.org/gzip") }, "get gzipped okay";

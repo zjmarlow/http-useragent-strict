@@ -10,20 +10,21 @@
   ],
   "description": "Web user agent",
   "license": "MIT",
-  "name": "HTTP::UserAgent",
+  "name": "http-useragent-strict",
   "perl": "6.*",
   "provides": {
-	"HTTP::UserAgent::Strict": "lib/HTTP/UserAgent/Strict.rakumod",
-	"HTTP::Message::Strict": "lib/HTTP/UserAgent/Strict.rakumod",
-	"HTTP::Request::Strict": "lib/HTTP/UserAgent/Strict.rakumod",
-	"HTTP::Response::Strict": "lib/HTTP/UserAgent/Strict.rakumod",
-	"HTTP::Header::Strict": "lib/HTTP/UserAgent/Strict.rakumod",
-	"HTTP::Header::ETag": "lib/HTTP/Header/ETag.rakumod"
+	"HTTP::Strict::UserAgent": "lib/HTTP/Strict/UserAgent.rakumod",
+	"HTTP::Strict::Message": "lib/HTTP/Strict/Message.rakumod",
+	"HTTP::Strict::Request": "lib/HTTP/Strict/Request.rakumod",
+	"HTTP::Strict::Response": "lib/HTTP/Strict/Response.rakumod",
+	"HTTP::Strict::Header": "lib/HTTP/Strict/Header.rakumod",
+  "HTTP::Strict::Header::Field": "lib/HTTP/Strict/Header/Field.rakumod",
+	"HTTP::Strict::Header::ETag": "lib/HTTP/Strict/Header/ETag.rakumod"
   },
   "raku": "6.*",
   "resources": [
   ],
-  "source-url": "https://github.com/raku-community-modules/HTTP-UserAgent.git",
+  "source-url": "https://github.com/zjmarlow/http-useragent-strict.git",
   "tags": [
 	"HTTP",
 	"USERAGENT",

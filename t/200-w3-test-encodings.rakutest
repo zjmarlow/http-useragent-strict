@@ -1,7 +1,7 @@
-# TODO probably should contain Bufs of data and test HTTP::Message
+# TODO probably should contain Bufs of data and test HTTP::Strict::Message
 # directly rather than go over the wire.
 
-use HTTP::UserAgent;
+use HTTP::Strict::UserAgent;
 use Test;
 
 my @tests = 3..9; # TODO 1 and 2
@@ -13,7 +13,7 @@ unless %*ENV<NETWORK_TESTING> {
     exit;
 }
 
-my $ua = HTTP::UserAgent.new;
+my $ua = HTTP::Strict::UserAgent.new;
 
 for @tests -> $i {
     my $url = "http://www.w3.org/2006/11/mwbp-tests/test-encoding-{$i}.html";

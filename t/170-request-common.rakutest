@@ -1,5 +1,5 @@
 use Test;
-use HTTP::Request::Common;
+use HTTP::Strict::Request::Common;
 use URI;
 
 plan 7;
@@ -25,8 +25,8 @@ subtest {
             foo => "b&r\x1F42B",
         });
         is $req.method, 'POST';
-        is $req.header.field('content-type'), 'application/x-www-form-urlencoded';
-        is $req.header.field('content-length'), '21';
+        is $req.header.field('content-type'), 'Content-Type: application/x-www-form-urlencoded';
+        is $req.header.field('content-length'), 'Content-Length: 21';
         is $req.content.decode, 'foo=b%26r%F0%9F%90%AB';
     }, 'uri';
     subtest {
@@ -37,9 +37,9 @@ subtest {
             ],
             X-Foo => 'Bar');
         is $req.method, 'POST';
-        is $req.header.field('content-type'), 'application/x-www-form-urlencoded';
-        is $req.header.field('content-length'), '21';
-        is $req.header.field('X-Foo'), 'Bar';
+        is $req.header.field('content-type'), 'Content-Type: application/x-www-form-urlencoded';
+        is $req.header.field('content-length'), 'Content-Length: 21';
+        is $req.header.field('X-Foo'), 'X-Foo: Bar';
         is $req.content.decode, 'foo=b%26r%F0%9F%90%AB';
     }, 'content by array';
     subtest {
@@ -47,8 +47,8 @@ subtest {
                  content => "bumble",
                  Content-Type => "text/plain");
        is $req.content.encode, "bumble";
-       is $req.header.field('content-length'), 6;
-       is $req.header.field('Content-Type'), "text/plain";
+       is $req.header.field('content-length'), 'Content-Length: 6';
+       is $req.header.field('Content-Type'), "Content-Type: text/plain";
     }
 }, 'POST';
 
@@ -65,7 +65,7 @@ subtest {
         my $req = GET 'http://127.0.0.1/',
             X-Foo => 'Bar';
         is $req.method, 'GET';
-        is $req.header.field('X-Foo'), 'Bar';
+        is $req.header.field('X-Foo'), 'X-Foo: Bar';
     }, 'header';
 }, 'GET';
 
@@ -75,7 +75,7 @@ subtest {
             X-Foo => 'Bar',
             content => 'Yeah!';
         is $req.method, 'PUT';
-        is $req.header.field('X-Foo'), 'Bar';
+        is $req.header.field('X-Foo'), 'X-Foo: Bar';
         is $req.content, 'Yeah!';
     }, 'header';
 }, 'PUT';
@@ -85,7 +85,7 @@ subtest {
         my $req = DELETE 'http://127.0.0.1/',
             X-Foo => 'Bar';
         is $req.method, 'DELETE';
-        is $req.header.field('X-Foo'), 'Bar';
+        is $req.header.field('X-Foo'), 'X-Foo: Bar';
     }, 'header';
 }, 'DELETE';
 
@@ -94,7 +94,7 @@ subtest {
         my $req = HEAD 'http://127.0.0.1/',
             X-Foo => 'Bar';
         is $req.method, 'HEAD';
-        is $req.header.field('X-Foo'), 'Bar';
+        is $req.header.field('X-Foo'), 'X-Foo: Bar';
     }, 'header';
 }, 'HEAD';
 
@@ -104,7 +104,7 @@ subtest {
             X-Foo => 'Bar',
             content => 'Yeah!';
         is $req.method, 'PATCH';
-        is $req.header.field('X-Foo'), 'Bar';
+        is $req.header.field('X-Foo'), 'X-Foo: Bar';
         is $req.content, 'Yeah!';
     }, 'header';
 }, 'PATCH';

@@ -1,17 +1,17 @@
-use HTTP::UserAgent;
+use HTTP::Strict::UserAgent;
 use Test;
 
 plan 5;
 
 if %*ENV<NETWORK_TESTING> {
-    my $ua = HTTP::UserAgent.new;
+    my $ua = HTTP::Strict::UserAgent.new;
     subtest {
         my $res;
         lives-ok { $res = $ua.get("http://httpbin.org/image/jpeg") }, "getting image";
         is $res.media-type.type, 'image/jpeg', "and we actually got a JPEG";
         ok $res.is-binary, "and the result says it's binary";
         ok $res.content ~~ Blob, "and we got back a Blob";
-        is $res.content.elems, ~$res.field('Content-Length'), "and got the right length";
+        is $res.content.elems, ~$res.field('Content-Length').values, "and got the right length";
     }, "get jpeg";
     subtest {
         my $res;
@@ -19,7 +19,7 @@ if %*ENV<NETWORK_TESTING> {
         is $res.media-type.type, 'image/png', "and we actually got a PNG";
         ok $res.is-binary, "and the result says it's binary";
         ok $res.content ~~ Blob, "and we got back a Blob";
-        is $res.content.elems, ~$res.field('Content-Length'), "and got the right length";
+        is $res.content.elems, ~$res.field('Content-Length').values, "and got the right length";
     }, "get png";
     subtest {
         my $res;
@@ -36,7 +36,7 @@ if %*ENV<NETWORK_TESTING> {
         ok $res.is-binary, "and the result says it's binary";
         ok $res.content ~~ Blob, "and we got back a Blob";
         is $res.content.elems, 1024, "and got the right length";
-        is $res.content.elems, ~$res.field('Content-Length'), "and got the right length";
+        is $res.content.elems, ~$res.field('Content-Length').values, "and got the right length";
     }, "get octet-stream (not-chunked)";
     subtest {
         my $res;

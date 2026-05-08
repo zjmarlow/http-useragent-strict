@@ -1,9 +1,9 @@
 use Test;
-use HTTP::UserAgent;
+use HTTP::Strict::UserAgent;
 
 plan 7;
 
-my $ua = HTTP::UserAgent.new;
+my $ua = HTTP::Strict::UserAgent.new;
 
 lives-ok { $ua.auth('test', 'TEST' ) }, "set credentials";
 
@@ -12,7 +12,7 @@ is $ua.auth_password, 'TEST', "password got set okay";
 
 my $res;
 
-if %*ENV<NETWORK_TESTING>:exists {
+if %*ENV<NETWORK_TESTING> {
    lives-ok { $res = $ua.get('http://httpbin.org/basic-auth/xxx/XXX') }, "get site that requires auth (bad credentials)";
    is $res.code, 401, "and it's a 401";
 

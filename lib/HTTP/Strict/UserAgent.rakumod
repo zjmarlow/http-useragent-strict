@@ -421,7 +421,7 @@ multi method use-proxy ( Str $host ) returns Bool {
 }
 
 multi sub basic-auth-token ( Str $login, Str $passwd --> Str:D ) {
-	basic-auth-token: join ':', $login, $passwd;
+	basic-auth-token join ':', $login, $passwd;
 
 }
 

@@ -119,7 +119,7 @@ multi method is-chunked ( --> Bool:D ) {
 }
 
 method content-encoding {
-	$!header.field: 'Content-Encoding';
+	.values with $!header.field: 'Content-Encoding';
 }
 
 class X::Deflate is Exception {
@@ -137,7 +137,7 @@ method inflate-content ( --> Blob:D ) {
 					message =>
 						"Please install 'Compress::Zlib' to uncompress '$v' encoded content";
 		} else {
-			my $z = ::( 'Compress::Zlib::Stream' ).new: $v => True;
+			my $z = ::( 'Compress::Zlib::Stream' ).new: |{ $v => True };
 			$z.inflate: $!content;
 		}
 	} else {
@@ -249,10 +249,10 @@ method Str ( :$debug, Bool :$bin ) {
 					name => 'Content-Length',
 					values =>  [ ( $!content.?encode or $!content ).bytes.Str ];
 	}
-	
+	$s = join $CRLF, $s, '';
 	# The :bin will be passed from the H::UA
-	if not $bin {
-		$s = join $CRLF, $s, $!content || '';
+	if not $bin and $!content {
+		$s = join '', $s, $!content;
 	}
 	if $!content and $debug {
 		if $bin || self.is-binary {

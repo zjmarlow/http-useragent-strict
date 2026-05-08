@@ -1,9 +1,14 @@
 use Test;
-use HTTP::UserAgent;
+use HTTP::Strict::UserAgent;
 
 plan 4;
 
-my $ua = HTTP::UserAgent.new;
+unless %*ENV<NETWORK_TESTING> {
+	skip 'NETWORK_TESTING not set', 4;
+	exit;
+}
+
+my $ua = HTTP::Strict::UserAgent.new;
 my $res;
 
 lives-ok { $res = $ua.get('http://httpbin.org/status/404') }, "no exception - expect 404";
@@ -11,8 +16,8 @@ lives-ok { $res = $ua.get('http://httpbin.org/status/404') }, "no exception - ex
 ok !$res.is-success, "and it isn't successful";
 is $res.code, 404, "and a 404";
 
-$ua = HTTP::UserAgent.new(:throw-exceptions);
+$ua = HTTP::Strict::UserAgent.new(:throw-exceptions);
 
-throws-like {  $ua.get('http://httpbin.org/status/404') }, X::HTTP::Response, message => "Response error: '404 Not Found'", response => HTTP::Response;
+throws-like {  $ua.get('http://httpbin.org/status/404') }, X::HTTP::Strict::Response, message => "Response error: '404 Not Found'", response => HTTP::Strict::Response;
 
 # vim: expandtab shiftwidth=4

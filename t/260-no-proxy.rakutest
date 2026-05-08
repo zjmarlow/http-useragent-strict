@@ -1,5 +1,5 @@
-use HTTP::UserAgent;
-use HTTP::Request::Common;
+use HTTP::Strict::UserAgent;
+use HTTP::Strict::Request::Common;
 use Test;
 
 plan 10;
@@ -11,7 +11,7 @@ plan 10;
 
 my $ua;
 
-lives-ok { $ua = HTTP::UserAgent.new }, "create with environment NO_PROXY";
+lives-ok { $ua = HTTP::Strict::UserAgent.new }, "create with environment NO_PROXY";
 
 is-deeply $ua.no-proxy, [<localhost foo.bar.com baz.quux.com>], "got all from the environment";
 nok $ua.use-proxy('localhost'), "use-proxy - in no-proxy";

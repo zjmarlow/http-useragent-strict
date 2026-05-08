@@ -1,4 +1,4 @@
-use HTTP::UserAgent;
+use HTTP::Strict::UserAgent;
 use Test::Util::ServerPort;
 use Test;
 
@@ -10,7 +10,7 @@ use TestServer;
 %*ENV<NO_PROXY> = 'localhost';
 
 my $test-server = test-server(my $done-promise = Promise.new, :$port);
-my $ua          = HTTP::UserAgent.new;
+my $ua          = HTTP::Strict::UserAgent.new;
 
 plan 1;
 

@@ -1,4 +1,4 @@
-use HTTP::UserAgent;
+use HTTP::Strict::UserAgent;
 use Test;
 
 plan :skip-all<Need a new site to test with>;
@@ -20,7 +20,7 @@ my $wrapped = IO::Socket::INET.^find_method('recv').wrap(-> $o, |args {
     ret;
 });
 
-my $resp = HTTP::UserAgent.new.get(
+my $resp = HTTP::Strict::UserAgent.new.get(
     'https://www.punoftheday.com/cgi-bin/todayspun.pl'
 );
 

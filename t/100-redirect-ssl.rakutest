@@ -1,4 +1,4 @@
-use HTTP::UserAgent;
+use HTTP::Strict::UserAgent;
 use Test;
 
 plan 2;
@@ -17,7 +17,7 @@ unless %*ENV<NETWORK_TESTING> {
 
 my $url = 'http://github.com';
 
-my $ua  = HTTP::UserAgent.new;
+my $ua  = HTTP::Strict::UserAgent.new;
 my $get = ~$ua.get($url);
 
 ok $get ~~ /'</html>'/, 'http -> https redirect get 1/1';
@@ -25,6 +25,6 @@ ok $get ~~ /'</html>'/, 'http -> https redirect get 1/1';
 throws-like {
     temp $ua.max-redirects = 0;
     $ua.get($url);
-}, X::HTTP::Response, "Max redirects exceeded";
+}, X::HTTP::Strict::Response, "Max redirects exceeded";
 
 # vim: expandtab shiftwidth=4

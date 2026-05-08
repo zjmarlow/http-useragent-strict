@@ -1,6 +1,6 @@
 use Test;
 
-use HTTP::UserAgent;
+use HTTP::Strict::UserAgent;
 
 plan 3;
 
@@ -12,12 +12,12 @@ unless %*ENV<NETWORK_TESTING> {
 
 my $purl = 'http://purl.org/dc/elements/1.1/';
 
-my $ua = HTTP::UserAgent.new( useragent => "firefox_linux" );
+my $ua = HTTP::Strict::UserAgent.new( useragent => "firefox_linux" );
 
-my HTTP::Response $resp;
+my HTTP::Strict::Response $resp;
 
 lives-ok { $resp = $ua.get($purl) }, "make request to '$purl' lives";
-ok($resp.is-success, "request was successful");
+ok($resp.is-success, "request was successful " ~ $resp.status-line);
 
 ok($resp.content.defined, "and got some content back");
 
