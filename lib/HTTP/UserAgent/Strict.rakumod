@@ -1,11 +1,11 @@
-unit class HTTP::Strict::UserAgent;
+unit class HTTP::UserAgent::Strict;
 
 use HTTP::Strict;
-use HTTP::Strict::Response;
-use HTTP::Strict::Request;
-use HTTP::Strict::Cookies;
+use HTTP::Response::Strict;
+use HTTP::Request::Strict;
+use HTTP::Cookies::Strict;
 use HTTP::UserAgent::Common;
-use HTTP::Strict::UserAgent::Exception;
+use HTTP::UserAgent::Exception::Strict;
 
 use Encode;
 use URI;
@@ -18,7 +18,7 @@ constant CRLF = Buf.new: 13, 10;
 # placeholder role to make signatures nicer
 # and enable greater abstraction
 role Connection {
-	method send-request ( HTTP::Strict::Request $request ) {
+	method send-request ( HTTP::Request::Strict $request ) {
 		$request.field: Connection => 'close' unless $request.field: 'Connection';
 		if $request.binary {
 			self.print: $request.Str: :bin;
@@ -31,7 +31,7 @@ role Connection {
 
 has Int $.timeout is rw = 180;
 has $.useragent;
-has HTTP::Strict::Cookies $.cookies is rw = HTTP::Strict::Cookies.new:
+has HTTP::Cookies::Strict $.cookies is rw = HTTP::Cookies::Strict.new:
 	file	 => tempfile[0],
 	autosave => 1,
     ;
@@ -101,7 +101,7 @@ method auth ( Str $login, Str $password ) {
 proto method get(|) {*}
 
 multi method get ( URI $uri is copy, Bool :$bin,  *%header ) {
-	my $request  = HTTP::Strict::Request.new: GET => $uri, |%header;
+	my $request  = HTTP::Request::Strict.new: GET => $uri, |%header;
 	self.request: $request, :$bin
 }
 
@@ -112,7 +112,7 @@ multi method get ( Str $uri is copy, Bool :$bin,  *%header ) {
 proto method post(|) {*}
 
 multi method post ( URI $uri is copy, %form, Bool :$bin,  *%header ) {
-	my $request = HTTP::Strict::Request.new: POST => $uri, |%header;
+	my $request = HTTP::Request::Strict.new: POST => $uri, |%header;
 	$request.add-form-data: %form;
 	self.request: $request, :$bin
 }
@@ -124,7 +124,7 @@ multi method post ( Str $uri is copy, %form, Bool :$bin, *%header ) {
 proto method put(|) {*}
 
 multi method put ( URI $uri is copy, %form, Bool :$bin,  *%header) {
-	my $request = HTTP::Strict::Request.new: PUT => $uri, |%header;
+	my $request = HTTP::Request::Strict.new: PUT => $uri, |%header;
 	$request.add-form-data: %form;
 	self.request: $request, :$bin
 }
@@ -136,7 +136,7 @@ multi method put ( Str $uri is copy, %form, Bool :$bin, *%header ) {
 proto method delete(|) {*}
 
 multi method delete ( URI $uri is copy, Bool :$bin,  *%header ) {
-	my $request  = HTTP::Strict::Request.new: DELETE => $uri, |%header;
+	my $request  = HTTP::Request::Strict.new: DELETE => $uri, |%header;
 	self.request: $request, :$bin
 }
 
@@ -144,8 +144,8 @@ multi method delete ( Str $uri is copy, Bool :$bin, *%header ) {
 	self.delete(URI.new(_clear-url($uri)), :$bin, |%header)
 }
 
-method request ( HTTP::Strict::Request $request, Bool :$bin --> HTTP::Strict::Response:D ) {
-	my HTTP::Strict::Response $response;
+method request ( HTTP::Request::Strict $request, Bool :$bin --> HTTP::Response::Strict:D ) {
+	my HTTP::Response::Strict $response;
 
 	# add cookies to the request
 	$request.add-cookies: $.cookies;
@@ -163,7 +163,7 @@ method request ( HTTP::Strict::Request $request, Bool :$bin --> HTTP::Strict::Re
 	}
 	$conn.close;
 
-	X::HTTP::Strict::Response.new(:rc('No response')).throw unless $response;
+	X::HTTP::Response::Strict.new(:rc('No response')).throw unless $response;
 
 	$!debug-handle.say: "<<==Recv\n" ~ $response.Str: :debug if $!debug;
 
@@ -173,7 +173,7 @@ method request ( HTTP::Strict::Request $request, Bool :$bin --> HTTP::Strict::Re
 	if $response.code ~~ /^30<[0123]>/ {
 		$!redirects-in-a-row++;
 		if $!max-redirects < $!redirects-in-a-row {
-			X::HTTP::Strict::Response.new(:rc('Max redirects exceeded'), :response($response)).throw;
+			X::HTTP::Response::Strict.new(:rc('Max redirects exceeded'), :response($response)).throw;
 		}
 		my $new-request = $response.next-request;
 		return self.request: $new-request;
@@ -184,10 +184,10 @@ method request ( HTTP::Strict::Request $request, Bool :$bin --> HTTP::Strict::Re
 	if $!throw-exceptions {
 		given $response.code {
 			when /^4/ {
-				X::HTTP::Strict::Response.new(:rc($response.status-line), :response($response)).throw;
+				X::HTTP::Response::Strict.new(:rc($response.status-line), :response($response)).throw;
 			}
 			when /^5/ {
-				X::HTTP::Strict::Server.new(:rc($response.status-line), :response($response)).throw;
+				X::HTTP::Server::Strict.new(:rc($response.status-line), :response($response)).throw;
 			}
 		}
 	}
@@ -262,16 +262,16 @@ method get-chunked-content ( Connection $conn, Blob $content is rw --> Blob:D ) 
 	$content
 }
 
-method get-response ( HTTP::Strict::Request $request, Connection $conn, Bool :$bin --> HTTP::Strict::Response:D) {
+method get-response ( HTTP::Request::Strict $request, Connection $conn, Bool :$bin --> HTTP::Response::Strict:D) {
 	my Blob[uint8] $first-chunk = Blob[uint8].new;
 	my $msg-body-pos;
 
 	CATCH {
-		when X::HTTP::Strict::NoResponse {
-			X::HTTP::Strict::Internal.new(rc => 500, reason => "server returned no data").throw;
+		when X::HTTP::NoResponse::Strict {
+			X::HTTP::Internal::Strict.new(rc => 500, reason => "server returned no data").throw;
 		}
 		when /'Connection reset by peer'/ {
-			X::HTTP::Strict::Internal.new(rc => 500, reason => "Connection reset by peer").throw;
+			X::HTTP::Internal::Strict.new(rc => 500, reason => "Connection reset by peer").throw;
 		}
 	}
 
@@ -300,12 +300,12 @@ method get-response ( HTTP::Strict::Request $request, Connection $conn, Bool :$b
 	}
 
 
-	my HTTP::Strict::Response $response = HTTP::Strict::Response.new: $header-chunk;
+	my HTTP::Response::Strict $response = HTTP::Response::Strict.new: $header-chunk;
 	$response.request = $request;
 
 	if $response.has-content {
 		if !$msg-body-pos.defined {
-			X::HTTP::Strict::Internal.new(rc => 500, reason => "server returned no data").throw;
+			X::HTTP::Internal::Strict.new(rc => 500, reason => "server returned no data").throw;
 		}
 
 
@@ -313,8 +313,8 @@ method get-response ( HTTP::Strict::Request $request, Connection $conn, Bool :$b
 		# Turn the inner exceptions to ours
 		# This may really want to be outside
 		CATCH {
-			when X::HTTP::Strict::ContentLength {
-				X::HTTP::Strict::Header.new( :rc($_.message), :response($response) ).throw
+			when X::HTTP::ContentLength::Strict {
+				X::HTTP::Header::Strict.new( :rc($_.message), :response($response) ).throw
 			}
 		}
 		# We also need to handle 'Transfer-Encoding: chunked', which means
@@ -334,7 +334,7 @@ method get-response ( HTTP::Strict::Request $request, Connection $conn, Bool :$b
 
 proto method get-connection(|) {*}
 
-multi method get-connection ( HTTP::Strict::Request $request --> Connection:D ) {
+multi method get-connection ( HTTP::Request::Strict $request --> Connection:D ) {
 	my $host = $request.host;
 	my $port = $request.port;
     
@@ -352,7 +352,7 @@ multi method get-connection ( HTTP::Strict::Request $request --> Connection:D ) 
 }
 
 # my $https_lock = Lock.new;
-multi method get-connection ( HTTP::Strict::Request $request, Str $host, Int $port? --> Connection:D ) {
+multi method get-connection ( HTTP::Request::Strict $request, Str $host, Int $port? --> Connection:D ) {
 	my $conn;
 	if $request.scheme eq 'https' {
 		# $https_lock.lock;
@@ -375,7 +375,7 @@ method is-cgi() returns Bool {
 
 has $.http-proxy;
 # want the request to possibly match scheme, no_proxy etc
-method get-proxy ( HTTP::Strict::Request $request ) {
+method get-proxy ( HTTP::Request::Strict $request ) {
 	$!http-proxy //= do if self.is-cgi {
 		%*ENV<cgi_http_proxy> || %*ENV<CGI_HTTP_PROXY>;
 	} else {
@@ -404,7 +404,7 @@ method no-proxy {
 
 proto method use-proxy(|) {*}
 
-multi method use-proxy ( HTTP::Strict::Request $request --> Bool:D ) {
+multi method use-proxy ( HTTP::Request::Strict $request --> Bool:D ) {
 	self.use-proxy: $request.host
 }
 
@@ -429,32 +429,32 @@ multi sub basic-auth-token ( Str $creds where * ~~ /':'/ --> Str:D ) {
 	"Basic " ~ MIME::Base64.encode-str: $creds, :oneline;
 }
 
-method setup-auth(HTTP::Strict::Request $request) {
+method setup-auth(HTTP::Request::Strict $request) {
 	# use HTTP Auth
 	if self.use-auth: $request {
 		$request.field: Authorization => basic-auth-token $!auth_login,$!auth_password;
 	}
 }
 
-method use-auth ( HTTP::Strict::Request $request ) {
+method use-auth ( HTTP::Request::Strict $request ) {
 	$!auth_login.defined && $!auth_password.defined;
 }
 
 # :simple
 our sub get ( $target where URI|Str ) is export(:simple) {
-	my $ua = HTTP::Strict::UserAgent.new: :throw-exceptions;
+	my $ua = HTTP::UserAgent::Strict.new: :throw-exceptions;
 	my $response = $ua.get: $target;
 
 	$response.decoded-content
 }
 
 our sub head ( Str $url ) is export(:simple) {
-	my $ua = HTTP::Strict::UserAgent.new: :throw-exceptions;
+	my $ua = HTTP::UserAgent::Strict.new: :throw-exceptions;
 	$ua.get($url).header.hash<Content-Type Content-Length Last-Modified Expires Server>
 }
 
 our sub getprint ( Str $url ) is export(:simple) {
-	my $response = HTTP::Strict::UserAgent.new(:throw-exceptions).get($url);
+	my $response = HTTP::UserAgent::Strict.new(:throw-exceptions).get($url);
 	print $response.decoded-content;
 	$response.code
 }

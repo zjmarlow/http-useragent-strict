@@ -1,5 +1,5 @@
 use Test;
-use HTTP::Strict::UserAgent :simple;
+use HTTP::UserAgent::Strict :simple;
 use Test::IO::Capture;
 
 plan 7;
@@ -17,7 +17,7 @@ if %*ENV<NETWORK_TESTING> {
     is slurp('newfile'), $get, 'getstore 1/1';
     unlink 'newfile';
 
-    throws-like "use HTTP::Strict::UserAgent :simple; get('http://perlmonkeys.org/404here')", X::HTTP::Strict::Response, message => "Response error: '404 Not Found'";
+    throws-like "use HTTP::UserAgent::Strict :simple; get('http://perlmonkeys.org/404here')", X::HTTP::Response::Strict, message => "Response error: '404 Not Found'";
 
     my $head;
 

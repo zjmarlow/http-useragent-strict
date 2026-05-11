@@ -1,9 +1,9 @@
 use Test;
-use HTTP::Strict::UserAgent;
+use HTTP::UserAgent::Strict;
 
 plan 7;
 
-my $ua = HTTP::Strict::UserAgent.new;
+my $ua = HTTP::UserAgent::Strict.new;
 
 lives-ok { $ua.auth('test', 'TEST' ) }, "set credentials";
 

@@ -1,10 +1,10 @@
 use HTTP::Strict;
-use HTTP::Strict::Header::Field;
-use HTTP::Strict::Header::ETag;
+use HTTP::Header::Field::Strict;
+use HTTP::Header::Field::ETag::Strict;
 
-unit class HTTP::Strict::Header;
+unit class HTTP::Header::Strict;
 
-has HTTP::Strict::Header::Field:D @.fields;
+has HTTP::Header::Field::Strict:D @.fields;
 
 grammar Grammar {
 	token TOP {
@@ -62,7 +62,7 @@ grammar Grammar {
 class Actions {
 	method etag ( $/ ) {
 		$*OBJ.field:
-				HTTP::Strict::Header::ETag.new:
+				HTTP::Header::Field::ETag::Strict.new:
 						$<opaque-tag>.made,
 						weak => $/[0].Bool
 	}
@@ -87,7 +87,7 @@ class Actions {
 
 method new ( *%fields ) {
 	my @fields = %fields.sort(*.key).map: {
-		HTTP::Strict::Header::Field.new:
+		HTTP::Header::Field::Strict.new:
 				name => .key,
 				values => .values.list;
 	}
@@ -100,7 +100,7 @@ proto method field(|) {*}
 # set fields
 multi method field(*%fields) {
 	for %fields.sort(*.key) -> (:key($k), :value($v)) {
-		my $f = HTTP::Strict::Header::Field.new(:name($k), :values($v.list));
+		my $f = HTTP::Header::Field::Strict.new(:name($k), :values($v.list));
 		if @!fields.first({ .name.lc eq $k.lc }) {
 			@!fields[@!fields.first({ .name.lc eq $k.lc }, :k)] = $f;
 		}
@@ -116,7 +116,7 @@ multi method field($field) {
 	@!fields.first(*.name.lc eq $field-lc)
 }
 
-multi method field ( HTTP::Strict::Header::ETag:D $etag ) {
+multi method field ( HTTP::Header::Field::ETag::Strict:D $etag ) {
 	if @!fields.first: *.name.lc eq $etag.name.lc {
 		@!fields[ @!fields.first: *.name.lc eq $etag.name.lc ] = $etag;
 	} else {
@@ -130,7 +130,7 @@ method init-field(*%fields) {
 	for %fields.sort(*.key) -> (:key($k), :value($v)) {
 		my $k-lc := $k.lc;
 		@!fields.push:
-		  HTTP::Strict::Header::Field.new(:name($k), :values($v.list))
+		  HTTP::Header::Field::Strict.new(:name($k), :values($v.list))
 		  unless @!fields.first(*.name.lc eq $k-lc);
 	}
 }

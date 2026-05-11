@@ -1,6 +1,6 @@
-use HTTP::Strict::Header::Field;
+use HTTP::Header::Field::Strict;
 
-unit class HTTP::Strict::Header::ETag is HTTP::Strict::Header::Field;
+unit class HTTP::Header::Field::ETag::Strict is HTTP::Header::Field::Strict;
 
 has Bool:D $.weak is required;
 

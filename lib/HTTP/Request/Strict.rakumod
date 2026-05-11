@@ -1,16 +1,16 @@
 use HTTP::Strict;
-use HTTP::Strict::Header;
-use HTTP::Strict::Message;
+use HTTP::Header::Strict;
+use HTTP::Message::Strict;
 use URI;
 use URI::Escape;
 use HTTP::MediaType;
 use MIME::Base64;
 
-unit class HTTP::Strict::Request is HTTP::Strict::Message;
+subset HTTP::Request::RequestMethod of Str where <GET POST HEAD PUT DELETE PATCH>.any;
 
-subset RequestMethod of Str where <GET POST HEAD PUT DELETE PATCH>.any;
+unit class HTTP::Request::Strict is HTTP::Message::Strict;
 
-has RequestMethod $.method is rw;
+has HTTP::Request::RequestMethod $.method is rw;
 has $.url is rw;
 has $.file is rw;
 has $.uri is rw;
@@ -36,7 +36,7 @@ multi method new ( Bool :$bin, *%args ) {
 			}
 		}
 
-		my $header = HTTP::Strict::Header.new: |%fields;
+		my $header = HTTP::Header::Strict.new: |%fields;
 		self.new: $method // 'GET', $uri, $header, :$bin;
 	}
 	else {
@@ -44,7 +44,7 @@ multi method new ( Bool :$bin, *%args ) {
 	}
 }
 
-multi method new ( RequestMethod $method, URI $uri, HTTP::Strict::Header $header, Bool :$bin ) {
+multi method new ( HTTP::Request::RequestMethod $method, URI $uri, HTTP::Header::Strict $header, Bool :$bin ) {
 	my $url = $uri.grammar.parse_result.orig;
 	my $file = $uri.path_query || '/';
 
@@ -195,7 +195,7 @@ method form-data(Array:D $content, Str:D $boundary) {
 					$disp ~= qq!; filename="$usename"!;
 				}
 				my $content;
-				my $headers = HTTP::Strict::Header.new(|@headers);
+				my $headers = HTTP::Header::Strict.new(|@headers);
 				if $file {
 					# TODO: dynamic file upload support
 					$content = $file.IO.slurp;

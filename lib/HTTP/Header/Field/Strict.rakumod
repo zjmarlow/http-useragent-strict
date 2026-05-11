@@ -1,4 +1,4 @@
-unit class HTTP::Strict::Header::Field;
+unit class HTTP::Header::Field::Strict;
 
 has Str:D $.name is required;
 has Str:D @.values;

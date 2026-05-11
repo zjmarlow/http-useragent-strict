@@ -1,4 +1,4 @@
-use HTTP::Strict::UserAgent;
+use HTTP::UserAgent::Strict;
 use Test;
 
 plan 2;
@@ -15,10 +15,10 @@ unless %*ENV<NETWORK_TESTING> {
   exit;
 }
 
-my $ua = HTTP::Strict::UserAgent.new;
+my $ua = HTTP::UserAgent::Strict.new;
 
-my HTTP::Strict::Response $res;
-my $request = HTTP::Strict::Request.new(GET => 'http://httpbin.org/status/304');
+my HTTP::Response::Strict $res;
+my $request = HTTP::Request::Strict.new(GET => 'http://httpbin.org/status/304');
 lives-ok { $res = $ua.request($request) }, "another request that always results in 304 lives";
 is $res.code , 304, "and it is actually a 304";
 

@@ -1,17 +1,17 @@
 use Test;
 
 use HTTP::Strict;
-use HTTP::Strict::Message;
+use HTTP::Message::Strict;
 
 plan 20;
 
 ################################################################################
 
 # new
-my $m = HTTP::Strict::Message.new: 'somecontent', a => ['a1', 'a2'];
+my $m = HTTP::Message::Strict.new: 'somecontent', a => ['a1', 'a2'];
 
-isa-ok $m, HTTP::Strict::Message, 'new 1/4';
-isa-ok $m.header, HTTP::Strict::Header, 'new 2/4';
+isa-ok $m, HTTP::Message::Strict, 'new 1/4';
+isa-ok $m.header, HTTP::Header::Strict, 'new 2/4';
 is $m.field('a'), 'a: a1, a2', 'new 3/4';
 is $m.content, 'somecontent', 'new 4/4';
 
@@ -55,7 +55,7 @@ is $m.content, '', 'clear 2/2';
 
 ## parse a more complex example
 # new
-my $m2 = HTTP::Strict::Message.new;
+my $m2 = HTTP::Message::Strict.new;
 
 # parse
 $to_parse = "HTTP/1.1 200 OK\r\n"
@@ -91,8 +91,8 @@ is ~$m2.field('Transfer-Encoding'), 'Transfer-Encoding: chunked', 'parse complex
 is ~$m2.field('Content-Type'), 'Content-Type: text/plain; charset=UTF-8', 'parse complex 3/3';
 
 subtest {
-   is HTTP::Strict::Message.new.charset, 'iso-8859-1', "dumb default charset";
-   is HTTP::Strict::Message.new(Content-Type => 'text/plain').charset, 'iso-8859-1', 'default text charset';
-   is HTTP::Strict::Message.new(Content-Type => 'application/xml').charset, 'utf-8', 'default "non-text" charset';
-   is HTTP::Strict::Message.new(Content-Type => 'text/html; charset=utf-8').charset, 'utf-8', "explicity charset";
+   is HTTP::Message::Strict.new.charset, 'iso-8859-1', "dumb default charset";
+   is HTTP::Message::Strict.new(Content-Type => 'text/plain').charset, 'iso-8859-1', 'default text charset';
+   is HTTP::Message::Strict.new(Content-Type => 'application/xml').charset, 'utf-8', 'default "non-text" charset';
+   is HTTP::Message::Strict.new(Content-Type => 'text/html; charset=utf-8').charset, 'utf-8', "explicity charset";
 }, "charset";

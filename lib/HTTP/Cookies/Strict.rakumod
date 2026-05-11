@@ -1,15 +1,15 @@
-unit class HTTP::Strict::Cookies;
+unit class HTTP::Cookies::Strict;
 
 use HTTP::Cookie;
-use HTTP::Strict::Response;
-use HTTP::Strict::Request;
+use HTTP::Response::Strict;
+use HTTP::Request::Strict;
 use DateTime::Parse;
 
 has @.cookies;
 has $.file;
 has $.autosave is rw = 0;
 
-my grammar HTTP::Cookies::Grammar {
+my grammar Grammar {
 	token TOP {
 		'Set-Cookie:' [\s* <cookie> ','?]*
 	}
@@ -25,7 +25,7 @@ my grammar HTTP::Cookies::Grammar {
 	token httponly { :i HttpOnly }
 }
 
-my class HTTP::Cookies::Actions {
+my class Actions {
 	method cookie($/) {
 		my $h = HTTP::Cookie.new;
 		$h.name	 = ~$<name>;
@@ -44,12 +44,12 @@ my class HTTP::Cookies::Actions {
 	}
 }
 
-method extract-cookies(HTTP::Strict::Response $response) {
+method extract-cookies(HTTP::Response::Strict $response) {
 	self.set-cookie($_) for $response.field('Set-Cookie').grep({ $_.defined }).map({ .Str  }).flat;
 	self.save if $.autosave;
 }
 
-method add-cookie-header(HTTP::Strict::Request $request) {
+method add-cookie-header(HTTP::Request::Strict $request) {
 	for @.cookies -> $cookie {
 		# TODO this check sucks, eq is not the right (should probably use uri)
 		#next if $cookie.domain.defined
@@ -102,7 +102,7 @@ method clear {
 
 method set-cookie($str) {
 	my $*OBJ = self;
-	HTTP::Cookies::Grammar.parse($str, :actions(HTTP::Cookies::Actions));
+	Grammar.parse($str, :actions(Actions));
 
 	self.save if $.autosave;
 }

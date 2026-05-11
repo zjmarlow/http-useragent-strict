@@ -1,14 +1,14 @@
 use HTTP::Strict;
-use HTTP::Strict::Message;
+use HTTP::Message::Strict;
 use HTTP::Status;
-use HTTP::Strict::Request;
-use HTTP::Strict::UserAgent::Exception;
+use HTTP::Request::Strict;
+use HTTP::UserAgent::Exception::Strict;
 
-unit class HTTP::Strict::Response is HTTP::Strict::Message;
+unit class HTTP::Response::Strict is HTTP::Message::Strict;
 
 has $.status-line is rw;
 has $.code is rw;
-has HTTP::Strict::Request $.request is rw;
+has HTTP::Request::Strict $.request is rw;
 
 submethod BUILD ( :$!code ) {
 	$!status-line = self.set-code: $!code;
@@ -21,7 +21,7 @@ multi method new ( Blob:D $header-chunk ) {
 	# See https://tools.ietf.org/html/rfc7230#section-3.2.4
 	my ( $rl, $header );
 	( $rl, $header ) = $header-chunk.decode( 'ISO-8859-1' ).split: $CRLF, 2;
-	X::HTTP::Strict::NoResponse.new.throw unless $rl;
+	X::HTTP::NoResponse::Strict.new.throw unless $rl;
 
 	my $code = ( try $rl.split( ' ' )[1].Int ) // 500;
 	my $response = self.new: $code;
@@ -31,7 +31,7 @@ multi method new ( Blob:D $header-chunk ) {
 }
 
 multi method new ( Int:D $code = 200, *%fields ) {
-	my $header = HTTP::Strict::Header.new: |%fields;
+	my $header = HTTP::Header::Strict.new: |%fields;
 	self.bless: :$code, :$header;
 }
 
@@ -39,7 +39,7 @@ method content-length ( --> Int ) {
 	my $content-length = self.field('Content-Length').values[0];
 
 	with $content-length -> $c {
-		X::HTTP::Strict::ContentLength.new( message => "Content-Length header value '$c' is not numeric" ).throw
+		X::HTTP::ContentLength::Strict.new( message => "Content-Length header value '$c' is not numeric" ).throw
 			without $content-length = try +$content-length;
 		$content-length
 	} else {
@@ -59,8 +59,8 @@ method set-code ( Int:D $code ) {
 	$!status-line = join ' ', $code, get_http_status_msg $code;
 }
 
-method next-request ( --> HTTP::Strict::Request:D ) {
-	my HTTP::Strict::Request $new-request;
+method next-request ( --> HTTP::Request::Strict:D ) {
+	my HTTP::Request::Strict $new-request;
 
 	my $location = ~self.header.field('Location').values;
 
@@ -77,7 +77,7 @@ method next-request ( --> HTTP::Strict::Request:D ) {
 
 		my %args = $method => $location;
 
-		$new-request = HTTP::Strict::Request.new: |%args;
+		$new-request = HTTP::Request::Strict.new: |%args;
 
 		unless ~$new-request.field( 'Host' ).values {
 			my $hh = ~$!request.field( 'Host' ).values;

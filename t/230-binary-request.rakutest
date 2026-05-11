@@ -1,5 +1,5 @@
-use HTTP::Strict::UserAgent;
-use HTTP::Strict::Request::Common;
+use HTTP::UserAgent::Strict;
+use HTTP::Request::Common::Strict;
 use Test::Util::ServerPort; 
          
 use Test;
@@ -23,7 +23,7 @@ my $s  = test-server($p, port => $port);
 my $uri = "http://localhost:$port";
 
 subtest {
-    my $ua = HTTP::Strict::UserAgent.new;
+    my $ua = HTTP::UserAgent::Strict.new;
     my $buf = get-rand-buff();
     my $req;
     lives-ok { $req = POST($uri, content => $buf);  }, "create POST with Buf";
@@ -42,7 +42,7 @@ subtest {
 
 }, "POST (with defaults)";
 subtest {
-    my $ua = HTTP::Strict::UserAgent.new;
+    my $ua = HTTP::UserAgent::Strict.new;
     my $buf = get-rand-buff();
     my $req;
     lives-ok { $req = POST($uri, content => $buf, Content-Type => 'image/x-something', Content-Length => 158); }, "create POST with Buf (supplying Content-Type and Content-Length";
@@ -61,7 +61,7 @@ subtest {
 }, "POST (with explicit Content-Type)";
 
 subtest {
-    my $ua = HTTP::Strict::UserAgent.new;
+    my $ua = HTTP::UserAgent::Strict.new;
     # need the "\n" because our server is so crap
     my $buf = "Hello, World!\r\n".encode;
     my $req;
@@ -82,7 +82,7 @@ subtest {
 }, "POST (with something that will be text coming back)";
 
 subtest {
-    my $ua = HTTP::Strict::UserAgent.new;
+    my $ua = HTTP::UserAgent::Strict.new;
     my $buf = get-rand-buff();
     my $req;
     lives-ok { $req = PUT($uri, content => $buf); }, "create PUT with Buf";
@@ -100,7 +100,7 @@ subtest {
 
 }, "PUT (with defaults)";
 subtest {
-    my $ua = HTTP::Strict::UserAgent.new;
+    my $ua = HTTP::UserAgent::Strict.new;
     my $buf = get-rand-buff();
     my $req;
     lives-ok { $req = PUT($uri, content => $buf, Content-Type => 'image/x-something', Content-Length => 158); }, "create PUT with Buf (supplying Content-Type and Content-Length";
@@ -118,7 +118,7 @@ subtest {
 
 }, "PUT (with explicit Content-Type)";
 subtest {
-    my $ua = HTTP::Strict::UserAgent.new;
+    my $ua = HTTP::UserAgent::Strict.new;
     # need the "\n" because our server is so crap
     my $buf = "Hello, World!\n".encode;
     my $req;

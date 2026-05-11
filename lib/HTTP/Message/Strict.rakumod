@@ -1,14 +1,14 @@
-unit class HTTP::Strict::Message;
+unit class HTTP::Message::Strict;
 
 use HTTP::Strict;
-use HTTP::Strict::Header::Field;
-use HTTP::Strict::Header;
+use HTTP::Header::Field::Strict;
+use HTTP::Header::Strict;
 use HTTP::MediaType;
 use Encode;
 
 has Int:D $.MAX-SIZE is rw = 300;
 
-has HTTP::Strict::Header $.header = HTTP::Strict::Header.new;
+has HTTP::Header::Strict $.header = HTTP::Header::Strict.new;
 has $.content is rw = '';
 
 has $.protocol is rw = 'HTTP/1.1';
@@ -17,13 +17,13 @@ has Bool $.binary = False;
 has Str  @.text-types;
 
 multi method new ( $content, *%fields ) {
-	my $header = HTTP::Strict::Header.new: |%fields;
+	my $header = HTTP::Header::Strict.new: |%fields;
 
 	self.bless: :$header, :$content;
 }
 
 multi method new ( *%fields ) {
-	my $header = HTTP::Strict::Header.new: |%fields;
+	my $header = HTTP::Header::Strict.new: |%fields;
 
 	self.bless: :$header;
 }
@@ -33,7 +33,7 @@ method add-content ( $content ) {
 }
 
 class X::Decoding is Exception {
-	has HTTP::Strict::Message $.response;
+	has HTTP::Message::Strict $.response;
 	has Blob $.content;
 	method message {
 		"Problem decoding content";
@@ -110,7 +110,7 @@ method is-binary(--> Bool:D) { !self.is-text }
 #| multiple transfer-codings can be listed; chunked should be last
 #| https://datatracker.ietf.org/doc/html/rfc2616#section-14.41
 #| https://datatracker.ietf.org/doc/html/rfc7230#section-4
-multi method is-chunked ( HTTP::Strict::Header:D $header --> Bool:D ) {
+multi method is-chunked ( HTTP::Header::Strict:D $header --> Bool:D ) {
 	my $enc = $header.field: 'Transfer-Encoding';
 	so $enc and $enc.values.tail.trim.lc.ends-with: 'chunked'
 }
@@ -245,7 +245,7 @@ method Str ( :$debug, Bool :$bin ) {
 	if $!content and not self.is-chunked and not self.field: 'Content-Length' {
 		# self.field: Content-Length => ( $!content.?encode or $!content ).bytes.Str;
 		$s = join '', $s, .Str, $CRLF
-			with HTTP::Strict::Header::Field.new:
+			with HTTP::Header::Field::Strict.new:
 					name => 'Content-Length',
 					values =>  [ ( $!content.?encode or $!content ).bytes.Str ];
 	}

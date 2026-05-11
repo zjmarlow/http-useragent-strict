@@ -1,9 +1,9 @@
 use URI;
 use URI::Escape;
-use HTTP::Strict::Request;
+use HTTP::Request::Strict;
 use HTTP::MediaType;
 use MIME::Base64;
-use HTTP::Strict::Header;
+use HTTP::Header::Strict;
 
 constant $CRLF = "\x0d\x0a";
 my $HRC_DEBUG = %*ENV<HRC_DEBUG>.Bool;
@@ -11,15 +11,15 @@ my $HRC_DEBUG = %*ENV<HRC_DEBUG>.Bool;
 #- private subs ----------------------------------------------------------------
 my sub get-request(
   Str:D $meth, URI:D $uri, Bool :$bin, *%nameds
---> HTTP::Strict::Request:D) {
-    my $request  = HTTP::Strict::Request.new(|($meth.uc => $uri), :$bin);
+--> HTTP::Request::Strict:D) {
+    my $request  = HTTP::Request::Strict.new(|($meth.uc => $uri), :$bin);
     $request.header.field(|%nameds);
     $request
 }
 
 my sub send-text-content(
   Str:D $meth, URI:D $uri, :$content, *%nameds
---> HTTP::Strict::Request:D) {
+--> HTTP::Request::Strict:D) {
     my $request = get-request($meth, $uri, |%nameds);
     $request.add-content($_) with $content;
     $request

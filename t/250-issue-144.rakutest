@@ -1,4 +1,4 @@
-use HTTP::Strict::UserAgent;
+use HTTP::UserAgent::Strict;
 use Test::Util::ServerPort;
 
 use Test;
@@ -20,11 +20,11 @@ my $p = start {
 
 %*ENV<NO_PROXY> = 'localhost';
 
-my $ua = HTTP::Strict::UserAgent.new;
+my $ua = HTTP::UserAgent::Strict.new;
 
 my $res;
 
 todo 'Windows OS error messages are localized' if $*DISTRO.is-win;
-throws-like { $res = $ua.get("http://localhost:$port/") }, X::HTTP::Strict::Internal, rc => 500, "throws the correct exception";
+throws-like { $res = $ua.get("http://localhost:$port/") }, X::HTTP::Internal::Strict, rc => 500, "throws the correct exception";
 
 # vim: expandtab shiftwidth=4

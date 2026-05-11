@@ -1,5 +1,5 @@
 use Test;
-use HTTP::Strict::Cookies;
+use HTTP::Cookies::Strict;
 # strangely these aren't required for the test to work
 
 plan 31;
@@ -7,7 +7,7 @@ plan 31;
 BEGIN my $file = $*PROGRAM.sibling('cookies.dat').absolute;
 LEAVE try $file.IO.unlink;
 
-my $c = HTTP::Strict::Cookies.new(
+my $c = HTTP::Cookies::Strict.new(
 	file	 => $file,
 );
 
@@ -131,7 +131,7 @@ $c.load;
 is $c.cookies.elems, $elems_before_save, "Same number of cookies";
 #like $c.Str, /^<cookies>$/, "load 1/1";
 
-$c = HTTP::Strict::Cookies.new(
+$c = HTTP::Cookies::Strict.new(
 	file	 => $file,
 	autosave => 1,
 );
@@ -142,7 +142,7 @@ $c.set-cookie(
 	'Set-Cookie: namek=songo; expires=DATE2; Domain=gugyl.com;'
 );
 
-my $req = HTTP::Strict::Request.new(GET => 'http://gugyl.com');
+my $req = HTTP::Request::Strict.new(GET => 'http://gugyl.com');
 $c.add-cookie-header($req);
 # Domain restriction
 is $req.field('Cookie').values.elems, 1, 'add-cookie-header 1/?';
@@ -150,14 +150,14 @@ is $req.field('Cookie').values.elems, 1, 'add-cookie-header 1/?';
 $c.set-cookie(
 	'Set-Cookie: name3=value3; expires=DATE2; Path=/;'
 );
-$req = HTTP::Strict::Request.new(GET => 'http://gugle.com');
+$req = HTTP::Request::Strict.new(GET => 'http://gugle.com');
 $c.add-cookie-header($req);
 # 'Domain'less cookies
 #
 # TODO:
 #is $req.field('Cookie').values.elems, 2, 'add-cookie-header 2/3';
 
-$req = HTTP::Strict::Request.new(GET => 'http://gugle.com/path');
+$req = HTTP::Request::Strict.new(GET => 'http://gugle.com/path');
 $c.add-cookie-header($req);
 # Path restriction
 #
@@ -166,7 +166,7 @@ $c.add-cookie-header($req);
 
 # extract-cookkies
 subtest {
-	my $resp = HTTP::Strict::Response.new(200);
+	my $resp = HTTP::Response::Strict.new(200);
 	$resp.field(Set-Cookie => 'k=v');
 	$c.extract-cookies($resp);
 	is $c.cookies.elems, 5, 'extract-cookies 1/1';
@@ -185,7 +185,7 @@ is $c.cookies.elems, 0, 'autosave 1/1';
 subtest {
 
 	lives-ok {
-		my $c = HTTP::Strict::Cookies.new; 
+		my $c = HTTP::Cookies::Strict.new; 
 		lives-ok { $c.set-cookie('Set-Cookie: mykey=myvalue;'); }, "set cookie with mykey=myvalue";
 		is $c.cookies.elems, 1, "got one cookie";
 		is $c.cookies[0].name, "mykey", "got the expected name";
@@ -193,7 +193,7 @@ subtest {
 	}, "no hyphen in either key or value";
 
 	lives-ok {
-		my $c = HTTP::Strict::Cookies.new; 
+		my $c = HTTP::Cookies::Strict.new; 
 		lives-ok { $c.set-cookie('Set-Cookie: mykey=my-value;'); }, "set cookie with mykey=my-value";
 		is $c.cookies.elems, 1, "got one cookie";
 		is $c.cookies[0].name, "mykey", "got the expected name";
@@ -201,7 +201,7 @@ subtest {
 	}, "hyphen in value";
 
 	lives-ok {
-		my $c = HTTP::Strict::Cookies.new; 
+		my $c = HTTP::Cookies::Strict.new; 
 		lives-ok { $c.set-cookie('Set-Cookie: my-key=myvalue;'); }, "set cookie with my-key=myvalue";
 		is $c.cookies.elems, 1, "got one cookie";
 		is $c.cookies[0].name, "my-key", "got the expected name";
@@ -209,7 +209,7 @@ subtest {
 	}, "hyphen in name";
 
 	lives-ok {
-		my $c = HTTP::Strict::Cookies.new; 
+		my $c = HTTP::Cookies::Strict.new; 
 		lives-ok { $c.set-cookie('Set-Cookie: my-key=my-value;'); }, "set cookie with my-key=my-value";
 		is $c.cookies.elems, 1, "got one cookie";
 		is $c.cookies[0].name, "my-key", "got the expected name";
@@ -219,7 +219,7 @@ subtest {
 }, "issue #154";
 
 subtest {
-	my $c = HTTP::Strict::Cookies.new; 
+	my $c = HTTP::Cookies::Strict.new; 
 	lives-ok { $c.set-cookie('Set-Cookie: icwp-app-flash=deleted; expires=Thu, 01-Jan-1970 00:00:01 GMT; Max-Age=0; path=/'); }, "set cookie with representative values";
 	is $c.cookies.elems, 1, "got one cookies";
 	is $c.cookies[0].name, "icwp-app-flash", "got right name";

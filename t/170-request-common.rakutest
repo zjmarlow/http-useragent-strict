@@ -1,5 +1,5 @@
 use Test;
-use HTTP::Strict::Request::Common;
+use HTTP::Request::Common::Strict;
 use URI;
 
 plan 7;

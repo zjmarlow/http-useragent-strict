@@ -1,10 +1,10 @@
-use HTTP::Strict::UserAgent;
+use HTTP::UserAgent::Strict;
 use Test;
 
 plan 5;
 
 if %*ENV<NETWORK_TESTING> {
-    my $ua = HTTP::Strict::UserAgent.new;
+    my $ua = HTTP::UserAgent::Strict.new;
     subtest {
         my $res;
         lives-ok { $res = $ua.get("http://httpbin.org/image/jpeg") }, "getting image";

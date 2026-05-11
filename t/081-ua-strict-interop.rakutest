@@ -1,7 +1,7 @@
 use lib <t/lib>;
 
 use Test;
-use HTTP::Strict::UserAgent;
+use HTTP::UserAgent::Strict;
 use Test::Util::ServerPort;
 use TestServer;
 
@@ -17,7 +17,7 @@ my $test-server = test-full-message my $done-promise = Promise.new, :$port;
 
 say 'using port ', $port;
 
-my $uas = HTTP::Strict::UserAgent.new;
+my $uas = HTTP::UserAgent::Strict.new;
 my $rs = $uas.post: "http://localhost:$port/POST", { hello => 'world' };
 my ( $eol, $lok ) = $rs.content.split: "\x0d";
 is $eol, 'F', 'no extra eol';

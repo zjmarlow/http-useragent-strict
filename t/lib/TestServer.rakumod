@@ -62,7 +62,7 @@ module TestServer {
         $server-promise
     }
 	
-	use HTTP::Strict::Request;
+	use HTTP::Request::Strict;
 	sub test-full-message ( Promise $done-promise, Int :$port --> Promise:D ) is export {
 		start {
 			react {
@@ -71,7 +71,7 @@ module TestServer {
 				}
 				whenever IO::Socket::Async.listen: 'localhost', $port -> $conn {
 					whenever $conn.Supply: :bin -> $buf {
-						my HTTP::Strict::Request $r = HTTP::Strict::Request.new;
+						my HTTP::Request::Strict $r = HTTP::Request::Strict.new;
 						$r.parse: $buf.decode;
 						my ( $eol, $okl );
 						$eol = $r.content.ends-with: "\x0d\x0a";
