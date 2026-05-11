@@ -62,7 +62,7 @@ method add-cookie-header(HTTP::Strict::Request $request) {
 			$request.field(Cookie2 => '$Version="1"');
 		}
 		if $request.field('Cookie').defined {
-			$request.field( Cookie => $request.field("Cookie") ~ $cookiestr );
+			$request.field( Cookie => $request.field("Cookie").values ~ $cookiestr );
 		} else {
 			$request.field( Cookie => $cookiestr );
 		}
