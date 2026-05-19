@@ -6,7 +6,7 @@
   "build-depends": [
   ],
   "depends": [
-	"HTTP::UserAgent:auth<raku-community-modules>"
+	"HTTP::UserAgent:auth<zef:raku-community-modules>"
   ],
   "description": "Web user agent",
   "license": "MIT",
